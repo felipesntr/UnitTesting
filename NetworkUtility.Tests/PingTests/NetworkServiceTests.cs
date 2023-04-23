@@ -1,23 +1,31 @@
-﻿using FluentAssertions;
+﻿using System.Net.NetworkInformation;
+
+using FluentAssertions;
 using FluentAssertions.Extensions;
-using NetworkUtility.Ping;
-using System.Net.NetworkInformation;
+using FakeItEasy;
 using Xunit.Sdk;
+
+using NetworkUtility.DNS;
+using NetworkUtility.Ping;
 
 namespace NetworkUtility.Tests.PingTests
 {
     public class NetworkServiceTests
     {
         private readonly NetworkService _pingService;
+        private readonly IDNS _dns;
         public NetworkServiceTests()
         {
+            //Dependencies
+            _dns = A.Fake<IDNS>();
             //SUT
-            _pingService = new NetworkService();
+            _pingService = new NetworkService(_dns);
         }
 
         [Fact]
         public void NetworkService_SendPing_ReturnString()
         {
+            A.CallTo(() => _dns.SendDNS()).Returns(true);
             //Act
             var result = _pingService.SendPing();
             //Assert
